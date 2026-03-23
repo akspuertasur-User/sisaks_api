@@ -1,10 +1,8 @@
-FROM php:8.2-apache
+FROM php:8.2-cli
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-# Desactivar MPM conflictivos y dejar prefork (el correcto para PHP)
-RUN a2dismod mpm_event && a2enmod mpm_prefork
+WORKDIR /app
+COPY . /app
 
-COPY . /var/www/html/
-
-EXPOSE 80
+CMD php -S 0.0.0.0:8080 -t /app
