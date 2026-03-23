@@ -1,2 +1,6 @@
 <?php
-echo "API SISAKS activa";
+header('Content-Type: application/json; charset=utf-8');
+echo json_encode([
+    'ok' => true,
+    'mensaje' => 'API SISAKS activa'
+]);
