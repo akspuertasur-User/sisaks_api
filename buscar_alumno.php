@@ -2,13 +2,16 @@
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
+ini_set('display_errors', 0);
+error_reporting(0);
+
 $host = getenv('MYSQLHOST');
 $port = getenv('MYSQLPORT');
 $dbname = 'sisaks_db';
 $user = getenv('MYSQLUSER');
 $pass = getenv('MYSQLPASSWORD');
 
-$rut = $_GET['rut'] ?? '';
+$rut = trim($_GET['rut'] ?? '');
 
 if ($rut === '') {
     echo json_encode([
@@ -23,7 +26,7 @@ $conn = new mysqli($host, $user, $pass, $dbname, (int)$port);
 if ($conn->connect_error) {
     echo json_encode([
         'ok' => false,
-        'mensaje' => 'Error de conexión: ' . $conn->connect_error
+        'mensaje' => 'Error de conexión'
     ]);
     exit;
 }
@@ -38,9 +41,18 @@ $sql = "SELECT id, rut_alumno, nombre_alumno, edad, fecha_nacimiento, fecha_ingr
         LIMIT 1";
 
 $stmt = $conn->prepare($sql);
+
+if (!$stmt) {
+    echo json_encode([
+        'ok' => false,
+        'mensaje' => 'Error preparando consulta'
+    ]);
+    $conn->close();
+    exit;
+}
+
 $stmt->bind_param("s", $rut);
 $stmt->execute();
-
 $result = $stmt->get_result();
 
 if ($row = $result->fetch_assoc()) {
