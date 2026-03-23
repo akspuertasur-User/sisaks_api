@@ -4,7 +4,7 @@ header('Access-Control-Allow-Origin: *');
 
 $host = getenv('MYSQLHOST');
 $port = getenv('MYSQLPORT');
-$dbname = getenv('MYSQLDATABASE');
+$dbname = 'sisaks_db';
 $user = getenv('MYSQLUSER');
 $pass = getenv('MYSQLPASSWORD');
 
