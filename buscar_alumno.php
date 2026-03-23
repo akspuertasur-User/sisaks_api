@@ -33,11 +33,26 @@ if ($conn->connect_error) {
 
 $conn->set_charset("utf8mb4");
 
-$sql = "SELECT id, rut_alumno, nombre_alumno, edad, fecha_nacimiento, fecha_ingreso,
-               direccion, rut_apoderado, nombre_apoderado, talla_polera,
-               talla_karategui, cinto_inicial, escuela_id, created_at, activo
-        FROM alumnos
-        WHERE rut_alumno = ?
+$sql = "SELECT 
+            a.id,
+            a.rut_alumno,
+            a.nombre_alumno,
+            a.edad,
+            a.fecha_nacimiento,
+            a.fecha_ingreso,
+            a.direccion,
+            a.rut_apoderado,
+            a.nombre_apoderado,
+            a.talla_polera,
+            a.talla_karategui,
+            a.cinto_inicial,
+            a.escuela_id,
+            e.nombre_escuela,
+            a.created_at,
+            a.activo
+        FROM alumnos a
+        LEFT JOIN escuela e ON a.escuela_id = e.id
+        WHERE a.rut_alumno = ?
         LIMIT 1";
 
 $stmt = $conn->prepare($sql);
