@@ -49,7 +49,8 @@ $sql = "SELECT
             a.escuela_id,
             e.nombre_escuela,
             a.created_at,
-            a.activo
+            a.activo,
+            a.total_asistencia
         FROM alumnos a
         LEFT JOIN escuela e ON a.escuela_id = e.id
         WHERE a.rut_alumno = ?
