@@ -1,11 +1,30 @@
 <?php
-header('Content-Type: application/json');
-include 'conexion.php';
+header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
+
+ini_set('display_errors', 0);
+error_reporting(0);
+
+$host = getenv('MYSQLHOST');
+$port = getenv('MYSQLPORT');
+$dbname = 'sisaks_db';
+$user = getenv('MYSQLUSER');
+$pass = getenv('MYSQLPASSWORD');
+
+$conn = new mysqli($host, $user, $pass, $dbname, (int)$port);
+
+if ($conn->connect_error) {
+    echo json_encode([
+        "ok" => false,
+        "mensaje" => "Error conexión BD"
+    ]);
+    exit;
+}
 
 $rut = $_POST['rut'] ?? '';
 $clave = $_POST['clave'] ?? '';
 
-if (empty($rut) || empty($clave)) {
+if ($rut === '' || $clave === '') {
     echo json_encode([
         "ok" => false,
         "mensaje" => "Debe ingresar rut y clave"
@@ -36,7 +55,7 @@ $row = $result->fetch_assoc();
 if ($row["clave"] !== $clave) {
     echo json_encode([
         "ok" => false,
-        "mensaje": "Clave incorrecta"
+        "mensaje" => "Clave incorrecta"
     ]);
     exit;
 }
