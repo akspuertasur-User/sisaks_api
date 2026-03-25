@@ -13,7 +13,7 @@ $sql = "SELECT
         FROM alumnos a
         INNER JOIN escuela e ON e.id = a.escuela_id
         WHERE a.activo = 1
-        ORDER BY e.nombre_escuela ASC, a.nombre_alumno ASC";
+        ORDER BY a.nombre_alumno ASC";
 
 $result = $conn->query($sql);
 
