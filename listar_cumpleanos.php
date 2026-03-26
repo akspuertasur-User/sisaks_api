@@ -11,8 +11,8 @@ $dbname = 'sisaks_db';
 $user = getenv('MYSQLUSER');
 $pass = getenv('MYSQLPASSWORD');
 
-$escuela_id = isset($_GET['escuela_id']) && $_GET['escuela_id'] !== ''
-    ? intval($_GET['escuela_id'])
+$usuario_id = isset($_GET['usuario_id']) && $_GET['usuario_id'] !== ''
+    ? intval($_GET['usuario_id'])
     : null;
 
 $conn = new mysqli($host, $user, $pass, $dbname, (int)$port);
@@ -27,7 +27,7 @@ if ($conn->connect_error) {
 
 $conn->set_charset("utf8mb4");
 
-$sql = "SELECT 
+$sql = "SELECT
             a.id,
             a.rut_alumno,
             a.nombre_alumno,
@@ -36,20 +36,29 @@ $sql = "SELECT
             e.nombre_escuela,
             a.activo
         FROM alumnos a
-        LEFT JOIN escuela e ON e.id = a.escuela_id
+        INNER JOIN escuela e ON e.id = a.escuela_id
+        INNER JOIN usuario_escuela ue ON ue.escuela_id = a.escuela_id
         WHERE a.activo = 1
           AND a.fecha_nacimiento IS NOT NULL";
 
 $params = [];
 $types = '';
 
-if ($escuela_id !== null && $escuela_id > 0) {
-    $sql .= " AND a.escuela_id = ?";
+if ($usuario_id !== null && $usuario_id > 0) {
+    $sql .= " AND ue.usuario_id = ?";
     $types .= 'i';
-    $params[] = $escuela_id;
+    $params[] = $usuario_id;
 }
 
-$sql .= " ORDER BY MONTH(a.fecha_nacimiento), DAY(a.fecha_nacimiento), a.nombre_alumno";
+$sql .= " GROUP BY
+            a.id,
+            a.rut_alumno,
+            a.nombre_alumno,
+            a.fecha_nacimiento,
+            a.escuela_id,
+            e.nombre_escuela,
+            a.activo
+          ORDER BY MONTH(a.fecha_nacimiento), DAY(a.fecha_nacimiento), a.nombre_alumno";
 
 $stmt = $conn->prepare($sql);
 
@@ -114,3 +123,4 @@ echo json_encode([
 
 $stmt->close();
 $conn->close();
+?>
