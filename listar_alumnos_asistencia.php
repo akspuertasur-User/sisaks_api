@@ -1,6 +1,17 @@
 <?php
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
 include 'conexion.php';
+
+$usuario_id = isset($_GET['usuario_id']) ? intval($_GET['usuario_id']) : 0;
+
+if ($usuario_id <= 0) {
+    echo json_encode([
+        "ok" => false,
+        "mensaje" => "Falta usuario_id"
+    ]);
+    exit;
+}
 
 $sql = "SELECT
             a.id,
@@ -11,11 +22,27 @@ $sql = "SELECT
             a.total_asistencia,
             a.activo
         FROM alumnos a
-        INNER JOIN escuela e ON e.id = a.escuela_id
+        INNER JOIN escuela e
+            ON e.id = a.escuela_id
+        INNER JOIN usuario_escuela ue
+            ON ue.escuela_id = a.escuela_id
         WHERE a.activo = 1
+          AND ue.usuario_id = ?
         ORDER BY a.nombre_alumno ASC";
 
-$result = $conn->query($sql);
+$stmt = $conn->prepare($sql);
+
+if (!$stmt) {
+    echo json_encode([
+        "ok" => false,
+        "mensaje" => "Error preparando consulta"
+    ]);
+    exit;
+}
+
+$stmt->bind_param("i", $usuario_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
 $alumnos = [];
 
@@ -28,5 +55,6 @@ echo json_encode([
     "alumnos" => $alumnos
 ]);
 
+$stmt->close();
 $conn->close();
 ?>
