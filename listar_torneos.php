@@ -2,7 +2,12 @@
 header('Content-Type: application/json');
 include 'conexion.php';
 
-$sql = "SELECT id, nombre, fecha, lugar, descripcion
+$sql = "SELECT 
+            id, 
+            nombre AS nombre_torneo,
+            fecha AS fecha_torneo,
+            lugar AS ciudad,
+            descripcion
         FROM Torneos
         ORDER BY fecha DESC, id DESC";
 
@@ -25,4 +30,6 @@ if ($resultado) {
         "mensaje" => "Error al listar torneos"
     ]);
 }
+
+$conn->close();
 ?>
