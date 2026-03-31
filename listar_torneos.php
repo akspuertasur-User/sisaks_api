@@ -8,13 +8,12 @@ error_reporting(0);
 include 'conexion.php';
 
 $sql = "SELECT 
-            id, 
-            nombre AS nombre_torneo,
-            fecha AS fecha_torneo,
-            lugar AS ciudad,
-            descripcion
-        FROM Torneos
-        ORDER BY fecha DESC, id DESC";
+            id,
+            nombre_torneo,
+            fecha_torneo,
+            ciudad
+        FROM torneos
+        ORDER BY fecha_torneo DESC, id DESC";
 
 $resultado = $conn->query($sql);
 
