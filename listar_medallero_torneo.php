@@ -20,7 +20,8 @@ if ($torneo_id <= 0) {
 $sql = "SELECT
             a.nombre_alumno,
             c.nombre_categoria AS categoria,
-            m.nombre_medalla AS medalla
+            m.nombre_medalla AS medalla,
+            at.url_imgur
         FROM alumno_torneo at
         INNER JOIN alumnos a
             ON a.id = at.alumno_id
