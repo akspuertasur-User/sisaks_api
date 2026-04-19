@@ -61,7 +61,7 @@ $stmt = $conn->prepare($sql);
 if (!$stmt) {
     echo json_encode([
         'ok' => false,
-        'mensaje' => 'Error preparando consulta'
+        'mensaje' => 'Error preparando consulta del alumno'
     ]);
     $conn->close();
     exit;
@@ -72,9 +72,48 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($row = $result->fetch_assoc()) {
+
+    $alumno_id = (int)$row['id'];
+
+    $torneos = [];
+
+    $sql_torneos = "SELECT
+                        t.id,
+                        t.nombre_torneo,
+                        t.fecha_torneo,
+                        t.ciudad,
+                        c.nombre_categoria AS categoria,
+                        m.nombre_medalla AS medalla,
+                        at.observacion,
+                        at.url_imgur
+                    FROM alumno_torneo at
+                    INNER JOIN torneos t 
+                        ON at.torneo_id = t.id
+                    LEFT JOIN categorias_torneo c 
+                        ON at.categoria_id = c.id
+                    LEFT JOIN medallas m 
+                        ON at.medalla_id = m.id
+                    WHERE at.alumno_id = ?
+                    ORDER BY t.fecha_torneo DESC, t.nombre_torneo ASC";
+
+    $stmt_torneos = $conn->prepare($sql_torneos);
+
+    if ($stmt_torneos) {
+        $stmt_torneos->bind_param("i", $alumno_id);
+        $stmt_torneos->execute();
+        $result_torneos = $stmt_torneos->get_result();
+
+        while ($torneo = $result_torneos->fetch_assoc()) {
+            $torneos[] = $torneo;
+        }
+
+        $stmt_torneos->close();
+    }
+
     echo json_encode([
         'ok' => true,
-        'alumno' => $row
+        'alumno' => $row,
+        'torneos' => $torneos
     ]);
 } else {
     echo json_encode([
