@@ -78,7 +78,9 @@ if ($row = $result->fetch_assoc()) {
     $torneos = [];
     $examenes = [];
 
+    // =========================
     // TORNEOS
+    // =========================
     $sql_torneos = "SELECT
                         t.id,
                         t.nombre_torneo,
@@ -89,9 +91,12 @@ if ($row = $result->fetch_assoc()) {
                         at.observacion,
                         at.url_imgur
                     FROM alumno_torneo at
-                    INNER JOIN torneos t ON at.torneo_id = t.id
-                    LEFT JOIN categorias_torneo c ON at.categoria_id = c.id
-                    LEFT JOIN medallas m ON at.medalla_id = m.id
+                    INNER JOIN torneos t 
+                        ON at.torneo_id = t.id
+                    LEFT JOIN categorias_torneo c 
+                        ON at.categoria_id = c.id
+                    LEFT JOIN medallas m 
+                        ON at.medalla_id = m.id
                     WHERE at.alumno_id = ?
                     ORDER BY t.fecha_torneo DESC, t.nombre_torneo ASC";
 
@@ -109,17 +114,22 @@ if ($row = $result->fetch_assoc()) {
         $stmt_torneos->close();
     }
 
+    // =========================
     // EXAMENES
-    // OJO: cambia nombres de tabla/campos si en tu BD son distintos
+    // =========================
     $sql_examenes = "SELECT
                         ex.id,
                         ex.fecha_examen,
-                        ex.cinto_actual_id,
-                        ex.cinto_a_subir_id,
+                        ca.cinto AS cinto_actual,
+                        cs.cinto AS cinto_a_subir,
                         ex.situacion,
                         ex.fecha_cambio_cinto,
                         ex.url_imgur
                      FROM examenes ex
+                     LEFT JOIN cintos ca
+                        ON ex.cinto_actual_id = ca.id
+                     LEFT JOIN cintos cs
+                        ON ex.cinto_a_subir_id = cs.id
                      WHERE ex.alumno_id = ?
                      ORDER BY ex.fecha_examen DESC, ex.id DESC";
 
