@@ -76,7 +76,11 @@ if ($row = $result->fetch_assoc()) {
     $alumno_id = (int)$row['id'];
 
     $torneos = [];
+    $examenes = [];
 
+    // =========================
+    // TORNEOS
+    // =========================
     $sql_torneos = "SELECT
                         t.id,
                         t.nombre_torneo,
@@ -110,16 +114,54 @@ if ($row = $result->fetch_assoc()) {
         $stmt_torneos->close();
     }
 
+    // =========================
+    // EXAMENES
+    // =========================
+    $sql_examenes = "SELECT
+                        ex.id,
+                        ex.fecha_examen,
+                        ca.nombre_cinto AS cinto_actual,
+                        cs.nombre_cinto AS cinto_a_subir,
+                        ex.situacion,
+                        ex.fecha_cambio_cinto,
+                        ex.url_imgur
+                     FROM examenes ex
+                     LEFT JOIN cintos ca
+                        ON ex.cinto_actual_id = ca.id
+                     LEFT JOIN cintos cs
+                        ON ex.cinto_a_subir_id = cs.id
+                     WHERE ex.alumno_id = ?
+                     ORDER BY ex.fecha_examen DESC, ex.id DESC";
+
+    $stmt_examenes = $conn->prepare($sql_examenes);
+
+    if ($stmt_examenes) {
+        $stmt_examenes->bind_param("i", $alumno_id);
+        $stmt_examenes->execute();
+        $result_examenes = $stmt_examenes->get_result();
+
+        while ($examen = $result_examenes->fetch_assoc()) {
+            $examenes[] = $examen;
+        }
+
+        $stmt_examenes->close();
+    }
+
     echo json_encode([
         'ok' => true,
         'alumno' => $row,
-        'torneos' => $torneos
+        'torneos' => $torneos,
+        'examenes' => $examenes
     ]);
 } else {
     echo json_encode([
         'ok' => false,
         'mensaje' => 'Alumno no encontrado'
     ]);
+}
+
+$stmt->close();
+$conn->close();
 }
 
 $stmt->close();
