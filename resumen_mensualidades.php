@@ -41,19 +41,20 @@ $resumen = [];
 
 for ($mes = 1; $mes <= 12; $mes++) {
     $sql = "SELECT
-                COUNT(DISTINCT a.id) AS total_alumnos,
+                COUNT(DISTINCT CASE 
+                    WHEN m.estado = 'PAGADO' THEN m.alumno_id
+                END) AS total_alumnos,
                 IFNULL(SUM(
                     CASE 
                         WHEN m.estado = 'PAGADO' THEN m.monto
                         ELSE 0
                     END
                 ), 0) AS total_mensualidades
-            FROM alumnos a
-            LEFT JOIN mensualidades m
-                ON m.alumno_id = a.id
-               AND m.anio = ?
-               AND m.mes = ?
-            WHERE a.activo = 1
+            FROM mensualidades m
+            INNER JOIN alumnos a ON a.id = m.alumno_id
+            WHERE m.anio = ?
+              AND m.mes = ?
+              AND m.estado = 'PAGADO'
               AND a.escuela_id = ?";
 
     $stmt = $conn->prepare($sql);
