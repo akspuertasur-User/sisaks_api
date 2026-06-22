@@ -51,6 +51,7 @@ function obtenerDetalleAlumno($conn, $alumno_id) {
                         a.nombre_apoderado,
                         a.talla_polera,
                         a.talla_karategui,
+                        a.cinto_actual,
                         a.cinto_inicial,
                         a.escuela_id,
                         e.nombre_escuela,
